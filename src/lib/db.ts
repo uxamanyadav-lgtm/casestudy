@@ -1,4 +1,6 @@
 // src/lib/db.ts
+"use server";
+
 import { Pool } from "pg";
 
 if (!process.env.DATABASE_URL) {
@@ -8,4 +10,3 @@ if (!process.env.DATABASE_URL) {
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
-
