@@ -3,14 +3,33 @@ import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { randomUUID } from "crypto";
 
+const ALLOWED_ORIGIN = process.env.CORS_ORIGIN || "https://amanyadav.work";
+
+function withCors(response: NextResponse) {
+  response.headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+  response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  return response;
+}
+
+export function OPTIONS() {
+  return withCors(
+    new NextResponse(null, {
+      status: 204,
+    })
+  );
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { email, otp, caseSlug } = await req.json();
 
     if (!email || !otp) {
-      return NextResponse.json(
-        { error: "Email and code are required." },
-        { status: 400 }
+      return withCors(
+        NextResponse.json(
+          { error: "Email and code are required." },
+          { status: 400 }
+        )
       );
     }
 
@@ -35,9 +54,11 @@ export async function POST(req: NextRequest) {
       const match = rows[0];
 
       if (!match) {
-        return NextResponse.json(
-          { error: "Invalid or expired code." },
-          { status: 400 }
+        return withCors(
+          NextResponse.json(
+            { error: "Invalid or expired code." },
+            { status: 400 }
+          )
         );
       }
 
@@ -64,12 +85,11 @@ export async function POST(req: NextRequest) {
       client.release();
     }
 
-    return NextResponse.json({ ok: true });
+    return withCors(NextResponse.json({ ok: true }));
   } catch (err) {
     console.error("Error in /api/verify-otp:", err);
-    return NextResponse.json(
-      { error: "Internal server error." },
-      { status: 500 }
+    return withCors(
+      NextResponse.json({ error: "Internal server error." }, { status: 500 })
     );
   }
 }
