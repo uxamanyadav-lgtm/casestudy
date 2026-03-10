@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
 
     try {
       await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || "Aman Portfolio <no-reply@amanyadav.work>",
+        from: "no-reply@amanyadav.work", // SIMPLE, VALID FROM
         to: email,
         subject: "Your access code for Aman’s case studies",
         text: `Your one-time access code is ${code}. It expires in 15 minutes.`,
